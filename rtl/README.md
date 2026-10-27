@@ -1,7 +1,10 @@
 # RTL implementation boundary
 
-No NPU modules exist yet. Start with pe.sv in M1, then array.sv in M2.
-Use docs/ARCHITECTURE.md for the arithmetic and cycle contract.
+`pe.sv` implements a signed INT8 multiplier, INT32 accumulator, and registered
+operand forwarding. `array.sv` connects a fixed 4x4 output-stationary array.
+Read docs/ARCHITECTURE.md for the arithmetic and timing contract and
+docs/SIMULATOR.md for simulation, trace semantics, and verification commands.
 
 The fixture under tests/fixtures/ verifies only the simulation toolchain.
-Do not move it here or treat its passing test as accelerator correctness.
+Accelerator correctness is checked separately with the direct PE harness
+and randomized array comparisons against the independent Python oracle.

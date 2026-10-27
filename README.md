@@ -3,9 +3,9 @@
 A weekend inference-chip design lab: a 4×4 INT8 systolic array, a tiny digit
 classifier, and a cycle-by-cycle explanation of where inference time goes.
 
-**Status: baseline setup.** The numerical oracle and toolchain smoke test work.
-The NPU processing element, array, classifier, and viewer are not implemented.
-Passing baseline CI does not establish NPU correctness or performance.
+The RTL datapath, persistent simulator, quantized classifier pipeline, experiment
+runner, and trace viewer are implemented. See [project status](docs/STATUS.md)
+for completed validation gates and [results](docs/RESULTS.md) for measured outcomes.
 
 ## Scope
 
@@ -28,15 +28,29 @@ cd tinynpu
 make setup
 make doctor
 make check
+make experiment
+make serve
 ```
+
+Open [the local viewer](http://127.0.0.1:8765/viewer/) after starting the server.
+Choose a digit and batch size, step through recorded RTL states, or press Play.
+The page shows real accumulator traces and separates measured compute cycles
+from modeled transfer costs.
 
 Python 3.12.13 and Python dependencies are pinned by `.python-version` and
 `uv.lock`. Verilator and the C++ compiler are system dependencies; `make doctor`
 reports their versions. CI exercises Linux and local validation exercises macOS.
 
-`make check` runs Ruff, Python reference tests, RTL smoke lint, and a compiled
-C++/Verilator smoke simulation. The smoke fixture is a register, not an NPU.
-`make format` formats Python sources.
+`make check` runs Ruff, reference/model/inference tests, real RTL verification,
+RTL lint, and a toolchain smoke test. `make verify` separately saves a 1,024-case
+RTL campaign. `make experiment` verifies hardware, prepares and freezes the model,
+evaluates all held-out images in batches of 1 and 4, and writes artifacts/run/.
+It refuses to overwrite evidence. Use `make experiment RUN_DIR=artifacts/run-2`
+for a separate run. To view that run, append
+`?data=../artifacts/run-2/demo.json` to the viewer URL.
+
+`make format` formats Python sources. Make and pytest explicitly use checkout
+sources so editable-install discovery cannot silently select an older package.
 
 If macOS marks virtual-environment `.pth` files hidden, Python can skip the
 editable package registration. The symptom is `ModuleNotFoundError: tinynpu`
@@ -52,16 +66,23 @@ If those files have the hidden flag, clear it with
 | `docs/ARCHITECTURE.md` | Arithmetic, timing, dataflow, and host boundary |
 | `docs/EXPERIMENTS.md` | Planned protocol and claim limits |
 | `docs/STATUS.md` | Implemented versus planned work |
-| `src/tinynpu/reference.py` | Independent exact matrix-product oracle |
-| `rtl/` | Future synthesizable NPU modules |
-| `sim/` | C++ harness and future simulation driver |
-| `tests/` | Reference tests and toolchain-only RTL fixture |
-| `configs/baseline.toml` | Proposed experiment settings |
+| `src/tinynpu/` | Oracle, model, simulator, inference, evidence, and experiment |
+| `rtl/` | Synthesizable PE and fixed 4×4 array |
+| `sim/` | Persistent C++ array driver and direct PE checks |
+| `tests/` | Arithmetic, controls, traces, model isolation, and inference tests |
+| `viewer/` | Static viewer replaying actual RTL traces |
+| `configs/baseline.toml` | Enforced experiment settings |
 | `artifacts/` | Ignored generated models, traces, and results |
 
-Start the build at **M1** in the build plan. Keep the first working array fixed
-at 4×4. Physical frequency, silicon area, power, FPGA integration, and a full
-instruction set are outside this weekend scope.
+The learning path follows M1 through M5 in the build plan. Inspect one PE,
+then the array schedule, then model tiling, and finally transfer accounting.
+Physical frequency, silicon area, power, FPGA integration, and a full instruction
+set are outside this scope. Bias, ReLU, rescaling, and argmax remain host operations.
+
+Each experiment includes a pre-evaluation freeze, immutable executable copy,
+model/split/config hashes, raw CSVs, representative traces, and a file manifest.
+CI runs the complete experiment from a fresh Linux checkout and preserves its
+evidence as a private Actions artifact for seven days.
 
 ## References
 

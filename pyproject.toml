@@ -11,6 +11,7 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
   "numpy>=2.2,<3",
   "scikit-learn>=1.6,<2",
+  "threadpoolctl>=3.5,<4",
 ]
 
 [dependency-groups]
@@ -24,6 +25,7 @@ packages = ["src/tinynpu"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
 addopts = "-ra --strict-markers"
 
 [tool.ruff]

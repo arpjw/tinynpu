@@ -1,4 +1,4 @@
-name: Baseline checks
+name: RTL and inference verification
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
@@ -28,3 +28,14 @@ jobs:
       - run: make setup
       - run: make doctor
       - run: make check
+      - run: node --check viewer/app.js
+      - name: Frozen held-out experiment
+        run: make experiment
+      - name: Preserve experiment evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: tinynpu-evidence
+          path: artifacts/run/
+          if-no-files-found: warn
+          retention-days: 7

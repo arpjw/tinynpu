@@ -5,7 +5,7 @@ CLAUDE.md is a compatibility entry point; keep it intact.
 
 - Preserve unrelated changes. Keep changes small and reviewable.
 - Do not commit, push, deploy, or change repository visibility unless requested.
-- Work from docs/BUILD_PLAN.md. Baseline setup is complete; NPU work starts at M1.
+- Work from docs/BUILD_PLAN.md and consult docs/STATUS.md for completed gates.
 - Keep the fixed 4×4, INT8/INT32 scope unless the user changes it.
 - SystemVerilog implements the datapath. Python controls tiling and host operations.
 - The Python oracle must remain independent of RTL scheduling and implementation.

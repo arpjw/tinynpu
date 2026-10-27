@@ -1,0 +1,30 @@
+name: Baseline checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  baseline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: "0.11.26"
+          enable-cache: true
+      - name: Install simulation toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y verilator build-essential
+      - run: make setup
+      - run: make doctor
+      - run: make check

@@ -1,0 +1,17 @@
+.DS_Store
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+obj_dir/
+artifacts/*
+!artifacts/README.md
+.env
+.env.*
+!.env.example
+*.vcd
+*.fst

@@ -1,0 +1,26 @@
+# Proposed protocol v1. Not consumed by an experiment runner yet.
+schema_version = 1
+seed = 20261027
+
+[hardware]
+rows = 4
+columns = 4
+operand_bits = 8
+accumulator_bits = 32
+max_reduction_length = 64
+dataflow = "output_stationary"
+
+[model]
+dataset = "sklearn_digits"
+layers = [64, 16, 10]
+activation = "relu"
+train_fraction = 0.70
+calibration_fraction = 0.10
+test_fraction = 0.20
+
+[experiment]
+batch_sizes = [1, 4]
+transfer_bytes_per_cycle = [1, 4, 8]
+transfer_overlap = false
+randomized_rtl_cases = 1000
+trace_schema_version = 1

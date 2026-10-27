@@ -1,4 +1,4 @@
-.PHONY: setup doctor lint format test rtl-lint sim-smoke sim-build check verify experiment serve
+.PHONY: setup doctor lint format test rtl-lint sim-smoke sim-build check verify experiment serve site
 
 UV ?= uv
 VERILATOR ?= verilator
@@ -39,6 +39,9 @@ experiment: sim-build
 
 serve:
 	$(UV) run --frozen python -m http.server $(PORT) --bind 127.0.0.1
+
+site:
+	$(UV) run --frozen python scripts/export_site.py --run "$(RUN_DIR)" --output dist
 
 sim-smoke:
 	mkdir -p build/toolchain

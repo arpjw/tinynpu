@@ -13,7 +13,7 @@
   function pause() {
     if (timer !== null) clearInterval(timer);
     timer = null;
-    element("play").textContent = "▶ Play";
+    element("play").textContent = "Play";
     element("play").setAttribute("aria-pressed", "false");
   }
 
@@ -24,8 +24,8 @@
     element("layer").textContent = `Layer ${trace.layer ?? "–"}`;
     element("tile").textContent = `Tile ${trace.tile_id}`;
     element("cycle").textContent = `Cycle ${trace.cycle}`;
-    element("frame").textContent = `FRAME ${frameIndex + 1} / ${current.traces.length}`;
-    element("phase").textContent = `${trace.phase} · step ${trace.logical_step} · ${trace.enable ? "enabled" : "held / cleared"}`;
+    element("frame").textContent = `Frame ${frameIndex + 1} / ${current.traces.length}`;
+    element("phase").textContent = trace.phase === "clear" ? "Clear accumulators" : `Step ${trace.logical_step}${trace.enable ? "" : " · paused"}`;
     element("step").disabled = frameIndex === current.traces.length - 1;
     for (let row = 0; row < 4; row += 1) {
       for (let col = 0; col < 4; col += 1) {
@@ -49,7 +49,7 @@
   function start() {
     if (current.traces.length < 2) return;
     if (frameIndex >= current.traces.length - 1) frameIndex = 0;
-    element("play").textContent = "Ⅱ Pause";
+    element("play").textContent = "Pause";
     element("play").setAttribute("aria-pressed", "true");
     renderFrame();
     timer = setInterval(() => {
@@ -65,8 +65,8 @@
     if (ctx) {
       for (let i = 0; i < 64; i += 1) {
         const intensity = Math.max(0, Math.min(1, example.pixels[i] / 16));
-        const rgb = [24, 53, 43].map((base, channel) => Math.round(base + ([240, 241, 204][channel] - base) * intensity));
-        ctx.fillStyle = `rgb(${rgb.join(",")})`;
+        const shade = Math.round(245 - intensity * 210);
+        ctx.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
         ctx.fillRect((i % 8) * 20, Math.floor(i / 8) * 20, 20, 20);
       }
     }
@@ -82,7 +82,9 @@
     element("label").textContent = String(current.label);
     element("scrubber").max = String(current.traces.length - 1);
     element("play").disabled = current.traces.length < 2;
-    element("batch-detail").textContent = `Batch labels: ${current.batch_labels.join(", ")}. Predictions: ${current.batch_predictions.join(", ")}.`;
+    element("batch-detail").textContent = current.batch_size > 1
+      ? `Batch labels: ${current.batch_labels.join(", ")} · Predictions: ${current.batch_predictions.join(", ")}`
+      : "";
     drawDigit(current);
     renderFrame();
   }
@@ -95,7 +97,7 @@
     for (const { example, index } of available) {
       const option = document.createElement("option");
       option.value = String(index);
-      option.textContent = `Digit ${example.label} · example ${example.id}`;
+      option.textContent = `Digit ${example.label} · #${example.id}`;
       element("example").append(option);
     }
     const selected = available.find(({ example }) => example.id === previousId) ?? available[0];
@@ -167,7 +169,7 @@
 
   async function load() {
     try {
-      const path = new URLSearchParams(window.location.search).get("data") || "../artifacts/run/demo.json";
+      const path = new URLSearchParams(window.location.search).get("data") || document.querySelector('meta[name="trace-data"]').content;
       const url = new URL(path, window.location.href);
       if (url.origin !== window.location.origin) throw new Error("Trace artifacts must be served from the same origin as the viewer.");
       const response = await fetch(url);

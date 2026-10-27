@@ -5,6 +5,9 @@ recomputed artifact checksums, saved-result arithmetic, fixed-model predictions,
 and recorded trace transitions. It did not retrain, tune, rebuild, or rerun the
 RTL campaign. Only this report was written.
 
+This is a historical audit of the snapshot identified below. Later viewer,
+packaging, and release changes are not covered by its source-linkage check.
+
 - Frozen source commit: `740842dbb99c9275b56fe852d773752acc31c930`.
 - Source ID: `e24d9fb21109c9e9166c130b6f654b815fb97d7a20386de0d26257c481c920e9`.
 - Evaluated executable SHA-256:
@@ -12,13 +15,13 @@ RTL campaign. Only this report was written.
 
 ## Integrity and qualification
 
-All 13 manifest-listed files match their SHA-256 and byte counts, and the run
-contains no unlisted evidence file other than the manifest itself. All 34 frozen
-source/configuration files match the current source fingerprint. The source ID
-recomputed from that fingerprint matches the freeze, summary, and manifest.
-Model, splits, training metadata, configuration, and qualification hashes match
-the freeze. The archived executable, current build executable, freeze hash, and
-qualification executable hash all agree.
+At audit time, all 13 manifest-listed files matched their SHA-256 and byte counts,
+and the run contained no unlisted evidence file other than the manifest itself.
+All 34 frozen source/configuration files matched the checkout inspected then.
+The source ID recomputed from that fingerprint matched the freeze, summary, and
+manifest. Model, splits, training metadata, configuration, and qualification hashes
+matched the freeze. The archived executable, build executable inspected then,
+freeze hash, and qualification executable hash all agreed.
 
 The qualification artifact records 1,024 passing array cases and 10,124 direct
 processing-element state checks. Its source hashes match the frozen sources.
@@ -68,5 +71,6 @@ These are RTL-simulation results with a serialized host-side load/compute/store
 model and ideal local buffer. Bias, ReLU, rescaling, argmax, and batching wait time
 are excluded from the cycle estimates. No clock frequency, physical latency,
 power, area, FPGA result, or GPU comparison is established. This audit validates
-internal evidence consistency and current source linkage; it is not an independent
-silicon measurement or a complete second execution of the experiment.
+internal evidence consistency and linkage to the frozen source snapshot; it is
+not an independent silicon measurement or a complete second execution of the
+experiment. Consult current CI results for checks of later revisions.

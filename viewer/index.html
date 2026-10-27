@@ -4,45 +4,82 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>TinyNPU · Inside the array</title>
+  <meta name="description" content="Step through real RTL traces of a tiny 4×4 INT8 inference accelerator.">
+  <meta name="trace-data" content="../artifacts/run/demo.json">
+  <title>TinyNPU · Trace viewer</title>
   <link rel="stylesheet" href="style.css">
   <script src="app.js" defer></script>
 </head>
 <body>
   <main>
-    <header class="masthead"><a class="wordmark" href="./">tiny<span>NPU</span><i aria-hidden="true"></i></a><span class="edition">ARCHITECTURE LAB / 001</span></header>
-    <section class="intro"><div><p class="eyebrow">16 processing elements. One digit at a time.</p><h1>Inside the array.</h1><p class="lede">Follow an inference through a 4 × 4 systolic array. Every operand, accumulation, and active cell comes from a recorded RTL simulation.</p></div><div class="spec"><span>INT8 × INT8 → INT32</span><span>OUTPUT-STATIONARY</span><span>64 → 16 → 10 CLASSIFIER</span></div></section>
-    <div id="status" class="status" role="status">Loading recorded simulation…</div>
+    <header class="header">
+      <h1>TinyNPU</h1>
+      <p>4 × 4 inference trace</p>
+    </header>
+    <div id="status" class="status" role="status">Loading recorded trace…</div>
     <div id="content" hidden>
-      <section class="workspace" aria-label="Inference trace explorer">
-        <aside class="input-panel panel">
-          <p class="eyebrow">01 / Input</p><h2>A handwritten digit</h2>
-          <label for="example">Held-out example</label><select id="example"></select>
-          <div class="digit-wrap"><canvas id="digit" width="160" height="160" role="img" aria-label="Selected handwritten digit"></canvas><span class="pixel-caption">8 × 8 PIXELS</span></div>
-          <div class="prediction"><span>Prediction<strong id="prediction">–</strong></span><span>True label<strong id="label">–</strong></span></div>
-          <label for="batch">Images per batch</label><select id="batch"><option value="1">1 image · mostly empty rows</option><option value="4">4 images · all four rows</option></select>
-          <p id="batch-detail" class="small"></p>
-          <p class="footnote">Rows map to images. Columns map to output neurons. Two columns are padded in the final output tile.</p>
-        </aside>
-        <section class="array-panel panel" aria-label="Recorded processing element states">
-          <div class="panel-heading"><div><p class="eyebrow">02 / Compute</p><h2>The systolic array</h2></div><span class="recorded"><i aria-hidden="true"></i> Recorded RTL</span></div>
+      <section class="input-bar" aria-label="Inference input">
+        <canvas id="digit" width="160" height="160" role="img" aria-label="Selected handwritten digit"></canvas>
+        <div class="field">
+          <label for="example">Example</label>
+          <select id="example"></select>
+        </div>
+        <div class="field batch-field">
+          <label for="batch">Batch size</label>
+          <select id="batch"><option value="1">1 image</option><option value="4">4 images</option></select>
+        </div>
+        <div class="prediction">
+          <span>Prediction <strong id="prediction">–</strong></span>
+          <span>Label <strong id="label">–</strong></span>
+        </div>
+        <p id="batch-detail" class="batch-detail"></p>
+      </section>
+      <section class="trace" aria-label="Recorded processing element states">
+        <div class="trace-heading">
+          <h2>Array</h2>
           <div class="trace-meta"><span id="layer">Layer –</span><span id="tile">Tile –</span><span id="cycle">Cycle –</span></div>
-          <div class="array-direction"><span>Weights ↓</span><span>Activations →</span></div>
-          <div id="array" class="array" aria-label="4 by 4 processing element array"></div>
-          <div class="legend"><span><i class="useful"></i>Useful MAC</span><span><i class="padding"></i>Padding MAC</span><span><i class="idle"></i>Idle / forwarding</span></div>
-          <label class="sr-only" for="scrubber">Recorded trace frame</label><input id="scrubber" type="range" min="0" max="0" value="0">
-          <div class="playback"><div class="playback-buttons"><button id="reset" title="Return to first frame">↤ <span>Reset</span></button><button id="play" class="primary">▶ Play</button><button id="step" title="Advance one recorded frame">Step →</button></div><label class="speed-label">Speed <select id="speed"><option value="250">4 fps</option><option value="100" selected>10 fps</option><option value="33">30 fps</option></select></label></div>
-          <div class="frame-line"><span id="frame">Frame –</span><span id="phase">–</span></div>
-          <p class="footnote">Cells show operands consumed at this edge and the accumulator after it. Playback speed is for inspection, not simulated chip frequency.</p>
-        </section>
+        </div>
+        <div class="array-direction"><span>Weights ↓</span><span>Activations →</span></div>
+        <div id="array" class="array" aria-label="4 by 4 processing element array"></div>
+        <div class="legend"><span><i class="useful"></i>Useful</span><span><i class="padding"></i>Padding</span><span><i class="idle"></i>Idle</span></div>
+        <label class="sr-only" for="scrubber">Recorded trace frame</label>
+        <input id="scrubber" type="range" min="0" max="0" value="0">
+        <div class="playback">
+          <div class="playback-buttons">
+            <button id="play" class="primary" aria-pressed="false">Play</button>
+            <button id="step" title="Advance one recorded frame">Step</button>
+            <button id="reset" title="Return to first frame">Reset</button>
+          </div>
+          <label class="speed-label">Speed <select id="speed"><option value="250">4 fps</option><option value="100" selected>10 fps</option><option value="33">30 fps</option></select></label>
+        </div>
+        <div class="frame-line"><span id="frame">Frame –</span><span id="phase">–</span></div>
+        <p class="help">Each cell shows its accumulator and input operands. Rows map to images; columns map to outputs.</p>
       </section>
-      <section class="evidence" aria-label="Verification and performance measurements">
-        <div class="evidence-intro"><p class="eyebrow">03 / Evidence</p><h2>Where do the cycles go?</h2><p>Compare the same array at different batch sizes and transfer rates. More occupied cells can improve work per cycle.</p></div>
-        <div class="metrics"><div><span>Float accuracy</span><strong id="float-accuracy">–</strong></div><div><span>Quantized accuracy</span><strong id="quant-accuracy">–</strong></div><div><span>RTL matrix mismatches</span><strong id="mismatches">–</strong></div><div><span>Held-out images</span><strong id="test-count">–</strong></div></div>
-        <div class="table-wrap"><table><caption>Compute cycles measured in RTL; load-to-store cycles use the stated transfer model. Host operations excluded.</caption><thead><tr><th scope="col">Batch</th><th scope="col">Transfer rate<br><small>modeled bytes/cycle</small></th><th scope="col">Compute / image<br><small>measured cycles</small></th><th scope="col">Load-to-store / image<br><small>modeled cycles</small></th><th scope="col">Compute<br><small>useful utilization</small></th><th scope="col">Load-to-store<br><small>useful utilization</small></th></tr></thead><tbody id="comparisons"></tbody></table></div>
-        <div class="boundaries"><p><strong>The model.</strong> Load → compute → store, with no overlap. Both operands reload for each tile. Padding is generated locally; only useful operands and INT32 outputs transfer. An ideal local buffer feeds the array.</p><p><strong>The boundary.</strong> Bias, ReLU, rescaling, and argmax run on the host and are excluded from timing. These are simulated and modeled cycles, not physical latency, clock frequency, power, or silicon area.</p></div>
-      </section>
-      <footer><span>tinyNPU / an inference architecture experiment</span><span id="source"></span></footer>
+      <details class="measurements">
+        <summary>Measurements &amp; model details</summary>
+        <div class="metrics">
+          <div><span>Float accuracy</span><strong id="float-accuracy">–</strong></div>
+          <div><span>Quantized accuracy</span><strong id="quant-accuracy">–</strong></div>
+          <div><span>RTL mismatches</span><strong id="mismatches">–</strong></div>
+          <div><span>Test images</span><strong id="test-count">–</strong></div>
+        </div>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="Performance comparison">
+          <table>
+            <caption>Compute cycles are measured in RTL. Total cycles include modeled transfers and exclude host operations.</caption>
+            <thead><tr><th scope="col">Batch</th><th scope="col">Transfer<br><small>bytes/cycle</small></th><th scope="col">Compute<br><small>cycles/image</small></th><th scope="col">Total<br><small>cycles/image</small></th><th scope="col">Compute<br><small>utilization</small></th><th scope="col">Total<br><small>utilization</small></th></tr></thead>
+            <tbody id="comparisons"></tbody>
+          </table>
+        </div>
+        <div class="notes">
+          <p>Transfers use a load → compute → store model with no overlap. Operands reload per tile, padding is generated locally, and an ideal local buffer feeds the array.</p>
+          <p>Bias, ReLU, rescaling, and argmax run on the host. These cycles do not establish physical latency, frequency, power, or area. Playback speed is for inspection only.</p>
+          <p id="source" class="source"></p>
+        </div>
+      </details>
+      <footer>Recorded RTL simulation · INT8 inputs · INT32 accumulators<br>
+        <a href="https://github.com/arpjw/tinynpu">Source</a> ·
+        <a href="https://github.com/arpjw/tinynpu/blob/main/THIRD_PARTY_NOTICES.md">Data attribution</a>
+      </footer>
     </div>
     <noscript><p class="status">Enable JavaScript to inspect the recorded trace.</p></noscript>
   </main>

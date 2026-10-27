@@ -7,9 +7,12 @@ The run completed on 2026-10-27 from source commit
 
 Source fingerprint:
 `e24d9fb21109c9e9166c130b6f654b815fb97d7a20386de0d26257c481c920e9`.
-Later documentation-only commits do not change the frozen executable/protocol
-fingerprint. Raw local evidence is in artifacts/run/; fresh CI runs generate
-their own manifests and platform-specific binaries.
+These results describe that frozen snapshot. The fingerprint includes viewer,
+build, and protocol files as well as executable sources, so later UI or packaging
+changes produce a different fingerprint even when the datapath is unchanged.
+Raw local evidence is in artifacts/run/; fresh CI runs generate their own
+manifests and platform-specific binaries. This report does not attest that a
+later checkout has the historical fingerprint or independently passed its checks.
 
 ## Correctness and model quality
 
@@ -66,9 +69,10 @@ executable before evaluation, then verified unchanged hashes at completion.
 See [the independent audit](AUDIT.md) for separate reconciliation of all manifest
 files, saved predictions, byte/cycle accounting, and retained trace transitions.
 
-The viewer was inspected in the in-app browser at a 463-pixel viewport with no
-document overflow. Digit selection, batch switching, cycle stepping, slider,
-play/pause, reset, final-frame behavior, and missing-artifact errors worked.
+At the time of this run, the viewer was inspected in the in-app browser at a
+463-pixel viewport with no document overflow. Digit selection, batch switching,
+cycle stepping, slider, play/pause, reset, final-frame behavior, and missing-artifact
+errors worked.
 All four examples replay 353 actual RTL records each, including tile clears.
 No substitute animation is generated when evidence is unavailable.
 

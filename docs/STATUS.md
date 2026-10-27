@@ -14,6 +14,8 @@
 - Deterministic training/calibration and safe numeric model serialization.
 - RTL-backed two-layer inference with exact per-tile comparisons.
 - Frozen experiment runner, transfer accounting, and trace viewer.
+- Manifest-verified static export and hosted trace viewer.
+- MIT license, dataset attribution, and contribution/deployment documentation.
 
 ## Validation
 
@@ -32,6 +34,25 @@ Local implementation checks passed on 2026-10-27:
 
 The CI result attached to the current commit is the hosted source of truth.
 Tool versions can be inspected with make doctor.
+
+## Release verification
+
+On 2026-10-27, release preparation passed 59 tests, RTL lint, the smoke test,
+JavaScript syntax checking, and the 1,024-case RTL campaign. A fresh frozen run
+in artifacts/release-final/ verified all 3,150 inference tiles with zero mismatches;
+both floating-point and quantized accuracy remained 345/360. Its source ID is
+`329cdb0778a5ec77fa490f51c519b93e67d64ce0f1a4cdf1c3e9e0e59788d12c`.
+
+The production viewer at https://tinynpu-lab.vercel.app was verified without
+authentication. Public asset hashes matched the local export. Playback,
+step/reset, example/batch selection, final-frame disabling, and measurements
+worked; the 375-pixel layout had no horizontal document overflow. No browser
+console warnings or errors were observed in those checks.
+
+Gitleaks 8.30.1 found no secrets in reachable Git history or the static export.
+A separate read-only review checked tracked history, attribution, and export
+boundaries. These checks are evidence of the reviewed snapshot, not a guarantee
+against every possible defect. The repository remains private pending publication.
 
 ## Milestones
 

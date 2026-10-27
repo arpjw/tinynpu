@@ -3,6 +3,9 @@
 A weekend inference-chip design lab: a 4×4 INT8 systolic array, a tiny digit
 classifier, and a cycle-by-cycle explanation of where inference time goes.
 
+[Open the trace viewer](https://tinynpu-lab.vercel.app) ·
+[Architecture](docs/ARCHITECTURE.md) · [Results](docs/RESULTS.md)
+
 The RTL datapath, persistent simulator, quantized classifier pipeline, experiment
 runner, and trace viewer are implemented. See [project status](docs/STATUS.md)
 for completed validation gates and [results](docs/RESULTS.md) for measured outcomes.
@@ -15,6 +18,16 @@ for completed validation gates and [results](docs/RESULTS.md) for measured outco
 - A 64 → 16 → 10 digit classifier, with bias, ReLU, and requantization on the host.
 - Batch sizes 1 and 4; explicit padding and useful-operation accounting.
 - RTL compute-cycle measurements, separately labeled modeled transfer costs.
+
+## What you learn
+
+- How operand skew and forwarding make a systolic array compute a matrix product.
+- Why batch size and padding affect the fraction of useful MACs.
+- How INT8 quantization and INT32 accumulation map a trained model onto hardware.
+- Why moving operands can cost more cycles than computing with them.
+
+Every matrix tile is checked against an independent integer reference. The viewer
+connects those checks to the operands and accumulators at each simulated edge.
 
 ## Quick start
 
@@ -36,6 +49,9 @@ Open [the local viewer](http://127.0.0.1:8765/viewer/) after starting the server
 Choose a digit and batch size, step through recorded RTL states, or press Play.
 The page shows real accumulator traces and separates measured compute cycles
 from modeled transfer costs.
+
+The hosted viewer replays saved examples. Run the experiment locally to train
+the fixed classifier, execute the RTL, and generate your own evidence.
 
 Python 3.12.13 and Python dependencies are pinned by `.python-version` and
 `uv.lock`. Verilator and the C++ compiler are system dependencies; `make doctor`
@@ -64,8 +80,9 @@ If those files have the hidden flag, clear it with
 | --- | --- |
 | `docs/BUILD_PLAN.md` | Two-day milestones and acceptance gates |
 | `docs/ARCHITECTURE.md` | Arithmetic, timing, dataflow, and host boundary |
-| `docs/EXPERIMENTS.md` | Planned protocol and claim limits |
+| `docs/EXPERIMENTS.md` | Fixed experiment protocol and claim limits |
 | `docs/STATUS.md` | Implemented versus planned work |
+| `docs/DEPLOYMENT.md` | Verified static export and Vercel deployment |
 | `src/tinynpu/` | Oracle, model, simulator, inference, evidence, and experiment |
 | `rtl/` | Synthesizable PE and fixed 4×4 array |
 | `sim/` | Persistent C++ array driver and direct PE checks |
@@ -82,7 +99,19 @@ set are outside this scope. Bias, ReLU, rescaling, and argmax remain host operat
 Each experiment includes a pre-evaluation freeze, immutable executable copy,
 model/split/config hashes, raw CSVs, representative traces, and a file manifest.
 CI runs the complete experiment from a fresh Linux checkout and preserves its
-evidence as a private Actions artifact for seven days.
+evidence as an Actions artifact for seven days. Access follows repository and
+GitHub permissions. Generated artifacts are excluded from the source checkout.
+Each fresh run records its own source fingerprint and toolchain; the historical
+results document the exact snapshot that produced them. Rebuilt executable hashes
+can differ across platforms and compiler versions.
+
+## Contributing and licenses
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for validation and contribution guidance.
+Original project code and documentation use the [MIT license](LICENSE).
+Digit images and labels originate from E. Alpaydin and C. Kaynak's UCI dataset,
+licensed under CC BY 4.0. See [third-party notices](THIRD_PARTY_NOTICES.md) for
+attribution, source links, and the distinction between code and data licensing.
 
 ## References
 

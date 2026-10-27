@@ -1,6 +1,6 @@
 # Architecture contract v1
 
-This specifies the planned implementation. See STATUS.md for current evidence.
+This specifies the implemented datapath and host contract. See STATUS.md for evidence.
 
 ## Compute
 

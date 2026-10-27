@@ -1,4 +1,4 @@
-# Proposed protocol v1. Not consumed by an experiment runner yet.
+# Protocol v1. Validated and consumed by tinynpu.experiment.
 schema_version = 1
 seed = 20261027
 
@@ -22,5 +22,5 @@ test_fraction = 0.20
 batch_sizes = [1, 4]
 transfer_bytes_per_cycle = [1, 4, 8]
 transfer_overlap = false
-randomized_rtl_cases = 1000
+randomized_rtl_cases = 1024
 trace_schema_version = 1

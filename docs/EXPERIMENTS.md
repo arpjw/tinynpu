@@ -1,7 +1,8 @@
-# Planned experiment protocol v1
+# Experiment protocol v1
 
-Status: proposed settings, not a frozen executed experiment.
-configs/baseline.toml is currently a planning artifact; no runner consumes it.
+The runner validates configs/baseline.toml, verifies the RTL, prepares a model,
+and writes freeze.json before accessing held-out pixels for evaluation.
+Each run uses a new output directory and preserves failures.
 
 Question: how much useful work does this 4×4 datapath perform for batch 1
 versus batch 4, and how does an explicit transfer model change utilization?
@@ -14,6 +15,10 @@ versus batch 4, and how does an explicit transfer model change utilization?
 - Persist exact indices and hashes; record the integer counts resulting from
   split rounding. Use a deterministic two-stage stratified split.
 - Train only on training data. Fit activation scales on calibration data.
+- Fixed classifier: MLPClassifier, one 16-unit ReLU layer, L-BFGS, alpha=1e-4,
+  max_iter=500, max_fun=15000, tol=1e-4, one numerical thread, fixed seed.
+  Normalize raw training inputs by 16 and fold that factor into the first
+  weight matrix. Record convergence warnings without retuning.
 - Freeze model, split, quantization, and run configuration before test evaluation.
 - Report FP accuracy, quantized reference accuracy, and RTL/reference mismatches.
 - Do not tune on test results. No accuracy or speedup claim is pre-established.
@@ -21,7 +26,7 @@ versus batch 4, and how does an explicit transfer model change utilization?
 ## Correctness controls
 
 1. Hand-computed and extreme signed arithmetic cases.
-2. At least 1,000 seeded RTL cases across supported K and edge conditions.
+2. 1,024 seeded RTL cases across supported K and edge conditions, plus direct PE checks.
 3. Exact INT32 agreement at every classifier matrix-product boundary.
 4. Identical predictions for quantized software and RTL-backed inference.
 5. Batch 1 and batch 4 preserve individual outputs and ordering.
@@ -50,7 +55,7 @@ Report:
 A network image requires 64*16 + 16*10 = 1,184 useful MACs.
 With the fixed schedule and no pauses, seven tiles require
 4*(64+6) + 3*(16+6) = 346 enabled compute cycles per batch.
-This is an analytical check to test, not an observed RTL result.
+The runner checks this analytical prediction against measured RTL counters.
 Seven clear cycles and transfer costs are additional.
 
 For full batches, the corresponding analytical compute utilization is
@@ -60,9 +65,15 @@ throughput. Batching wait time and host operations are outside this model.
 
 ## Evidence
 
-Future run manifest: source commit and dirty state, OS/tool versions, seed,
+Run manifest: source commit and dirty state, OS/tool versions, seed,
 configuration hash, split/model/scale hashes, invocation, schema versions,
 raw results, and verification counts. Preserve failures and failed claim gates.
+
+The source fingerprint covers executable sources, tests, viewer, build settings,
+architecture, and this protocol. Before evaluation, freeze model/split/training
+hashes and the simulator binary hash. Verify them again before reporting success.
+Representative viewer traces use the first batches beginning at test offsets 0
+and 4, without selecting on prediction correctness.
 
 Deterministic cycle counts do not require statistical confidence intervals.
 Report test-set size and classification accuracy as finite-sample observations.

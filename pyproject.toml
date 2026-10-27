@@ -7,11 +7,19 @@ name = "tinynpu"
 version = "0.0.1"
 description = "A small, verifiable inference accelerator design lab"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "numpy>=2.2,<3",
   "scikit-learn>=1.6,<2",
+  "threadpoolctl>=3.5,<4",
 ]
+
+[project.urls]
+Repository = "https://github.com/arpjw/tinynpu"
+Documentation = "https://github.com/arpjw/tinynpu/tree/main/docs"
+Demo = "https://tinynpu-lab.vercel.app"
 
 [dependency-groups]
 dev = [
@@ -24,6 +32,7 @@ packages = ["src/tinynpu"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
 addopts = "-ra --strict-markers"
 
 [tool.ruff]

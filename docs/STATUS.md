@@ -25,12 +25,20 @@ Local implementation checks passed on 2026-10-27:
 - 10,124 direct PE state checks passed.
 - Two-layer inference matched the reference, including batched versus single images.
 - RTL lint and the compiled C++/Verilator smoke test passed.
+- Frozen held-out inference: 3,150 tiles and 18,720 accumulator values matched.
+- FP and quantized test accuracy: 345/360 each, with two differing predictions.
+- Independent artifact/source/trace audit passed; see AUDIT.md.
+- Browser controls and missing-data behavior passed; see RESULTS.md.
 
 The CI result attached to the current commit is the hosted source of truth.
 Tool versions can be inspected with make doctor.
 
-## Remaining validation
+## Milestones
 
-- Full frozen held-out experiment and independent evidence reconciliation.
-- Browser inspection of the viewer with generated traces.
-- Hosted CI on the implementation commit.
+M0 through M5 have passed local acceptance gates. The implementation is delivered
+on the feature branch for review; no merge is performed automatically.
+Hosted CI at the current commit remains the source of truth for Linux validation.
+It runs the full test suite and frozen inference experiment from a fresh checkout.
+
+Future hardware work such as SRAM control, synthesis, FPGA deployment, and
+physical timing/power is outside this completed scope.

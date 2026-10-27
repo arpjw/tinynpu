@@ -53,12 +53,12 @@ console warnings or errors were observed in those checks.
 Gitleaks 8.30.1 found no secrets in reachable Git history or the static export.
 A separate read-only review checked tracked history, attribution, and export
 boundaries. These checks are evidence of the reviewed snapshot, not a guarantee
-against every possible defect. The repository remains private pending publication.
+against every possible defect. The repository was made public on 2026-10-27.
 
 ## Milestones
 
-M0 through M5 have passed local acceptance gates. The implementation is delivered
-on the feature branch for review; no merge is performed automatically.
+M0 through M5 have passed local acceptance gates. The reviewed implementation
+is merged into main, and the merged commit passed hosted CI.
 Hosted CI at the current commit remains the source of truth for Linux validation.
 It runs the full test suite and frozen inference experiment from a fresh checkout.
 

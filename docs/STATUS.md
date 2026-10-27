@@ -43,7 +43,8 @@ in artifacts/release-final/ verified all 3,150 inference tiles with zero mismatc
 both floating-point and quantized accuracy remained 345/360. Its source ID is
 `329cdb0778a5ec77fa490f51c519b93e67d64ce0f1a4cdf1c3e9e0e59788d12c`.
 
-The production viewer at https://tinynpu-lab.vercel.app was verified without
+The production viewer at https://tinynpu.vercel.app and its
+https://tinynpu-lab.vercel.app alias were verified without
 authentication. Public asset hashes matched the local export. Playback,
 step/reset, example/batch selection, final-frame disabling, and measurements
 worked; the 375-pixel layout had no horizontal document overflow. No browser

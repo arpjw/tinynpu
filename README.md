@@ -3,7 +3,7 @@
 A weekend inference-chip design lab: a 4×4 INT8 systolic array, a tiny digit
 classifier, and a cycle-by-cycle explanation of where inference time goes.
 
-[Open the trace viewer](https://tinynpu-lab.vercel.app) ·
+[Open the trace viewer](https://tinynpu.vercel.app) ·
 [Architecture](docs/ARCHITECTURE.md) · [Results](docs/RESULTS.md)
 
 The RTL datapath, persistent simulator, quantized classifier pipeline, experiment

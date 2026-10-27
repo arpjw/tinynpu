@@ -1,6 +1,8 @@
 # Static deployment
 
-Production viewer: https://tinynpu-lab.vercel.app
+Production viewer: https://tinynpu.vercel.app
+
+The alias https://tinynpu-lab.vercel.app serves the same deployment.
 
 The hosted demo replays recorded RTL states. It does not run Verilator, train a
 model, or accept inference jobs in the browser. No backend or secrets are needed.
